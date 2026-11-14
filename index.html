@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark"><head><script data-bard-client-injected="true">(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNjRiNzdiNDMzZDdhMDAyMWI4NjE4YjhjYTU3ZTMyZGI5MWUxMTMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6Ly9pZGVudGl0eXRvb2xraXQuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIwMzQ5MTYyNDE5MzM0NjY4OTU2MCIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiJjX2RkMDBlZjBlODAyOTk1OWJfY2Q0ZjU3ZmVfaW5kZXguaHRtbC04NjMifSwiZXhwIjoxNzk0Njc5NDY1LCJpYXQiOjE3OTQ2NzU4NjUsImFsZyI6IlJTMjU2In0.K9WgQh6wmDPM6L_he2bHsqRQoN8lZbwLEYHq2_tQfbR1xhg5J7CcjPTkwLCsdtazUI2T2yQAcUUZyhVkQgv4OuONAJ5W4WysiNZY_WAZZ8LCiwQxUc7xX3G1jyPdY6eByqAORytkgixIATwP9w2on8329R6B1fJRr_QixB4jZ0leuF35ejFAHLFJ2rvqkMk_tt3TTRmfzmffON9PUDdrJn0ajwJXJXRZJhLuW1CxJZBC_d1bH8IJ0k0OR3vB9KzaAeZHN5ibck8Wia8bREqSeNK613mYpJvN6Cyfj7QSiC7wwqphB0efPVGgtZSbILFBFMSql714yoF5soV-UfNOTg","c_dd00ef0e8029959b_cd4f57fe_index.html-863")</script><script data-bard-client-injected="true">
+  document.addEventListener('input', (event) => {
+    if (event.target && (event.target.isContentEditable || event.target.hasAttribute('contenteditable'))) {
+      const clonedDoc = document.cloneNode(true);
+      const injectedScripts = clonedDoc.querySelectorAll('[data-bard-client-injected="true"]');
+      injectedScripts.forEach(el => el.remove());
+      window.parent.postMessage({
+        type: 'inlineEdit',
+        html: '<!DOCTYPE html>\n' + clonedDoc.documentElement.outerHTML
+      }, '*');
+    }
+  });
+</script><script data-bard-client-injected="true">(function(){'use strict';window.addEventListener("message",a=>{a.data&&a.data.type==="SUPPLEMENTAL_DATA_UPDATE"&&window.dispatchEvent(new CustomEvent("supplementaldataupdate",{detail:a.data.data}))});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const SCROLL_KEYS = new Set([
+    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+    ' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End',
+  ]);
+  const HORIZONTAL_KEYS = new Set(['ArrowLeft', 'ArrowRight']);
+
+  function isTextEntryTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName;
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' ||
+        tagName === 'SELECT' || target.isContentEditable === true;
+  }
+
+  // An element absorbs the key only if it both overflows on the axis being
+  // scrolled and is configured to scroll on that axis. The cheap dimension
+  // test runs first because getComputedStyle forces a style recalc, and this
+  // runs on every keypress. Each axis is read from its own longhand: the
+  // 'overflow' shorthand serializes as two values when the axes differ, which
+  // is the common 'overflow-x: hidden; overflow-y: auto' pane.
+  function canScroll(node, horizontal) {
+    const overflows = horizontal ? node.scrollWidth > node.clientWidth
+                                 : node.scrollHeight > node.clientHeight;
+    if (!overflows) return false;
+    const style = window.getComputedStyle(node);
+    const overflow = horizontal ? style.overflowX : style.overflowY;
+    return overflow === 'auto' || overflow === 'scroll';
+  }
+
+  // Walks up from the event target so nested scrollers keep their behavior.
+  // <body> is included because pages that pin the root height make it the
+  // scroll container.
+  function hasScrollableAncestor(target, horizontal) {
+    let node = target;
+    while (node && node !== document.documentElement) {
+      if (canScroll(node, horizontal)) return true;
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  function rootCanScroll(horizontal) {
+    const scroller = document.scrollingElement || document.documentElement;
+    if (!scroller) return false;
+    // Tolerate a pixel of rounding so subpixel layouts do not look scrollable.
+    return horizontal ? scroller.scrollWidth > window.innerWidth + 1
+                      : scroller.scrollHeight > window.innerHeight + 1;
+  }
+
+  window.addEventListener('keydown', function(event) {
+    if (!SCROLL_KEYS.has(event.key)) return;
+    if (event.defaultPrevented) return;
+    // Alt and Meta turn arrows into browser history navigation, and Ctrl is
+    // reserved for shortcuts, so none of them are scroll intent.
+    if (event.altKey || event.metaKey || event.ctrlKey) return;
+
+    const target = event.target;
+    if (isTextEntryTarget(target)) return;
+
+    // Anything that can still absorb the scroll gets to keep it.
+    const horizontal = HORIZONTAL_KEYS.has(event.key);
+    if (rootCanScroll(horizontal)) return;
+    if (hasScrollableAncestor(target, horizontal)) return;
+
+    event.preventDefault();
+  }, {capture: true, passive: false});
+})();</script><script data-bard-client-injected="true">(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script data-bard-client-injected="true">
+let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function requestMediaPermissions(constraints) {
+    const mediaPromiseId = nextMediaPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingMediaResolvers[mediaPromiseId] = (granted) => {
+        delete pendingMediaResolvers[mediaPromiseId];
+        resolve(granted);
+      };
+    });
+
+    window.parent.postMessage({
+      type: 'requestMediaPermission',
+      constraints: constraints,
+      promiseId: mediaPromiseId,
+    }, '*');
+
+    return promise;
+  }
+
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          return requestMediaPermissions(constraints).then((granted) => {
+            if (granted) {
+              if (originalGetUserMedia) {
+                return originalGetUserMedia(constraints);
+              } else {
+                throw new Error("Original getUserMedia not available.");
+              }
+            } else {
+              throw new DOMException('Permission denied', 'NotAllowedError');
+            }
+          });
+        },
+        writable: false,
+        configurable: false
+      });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  function interceptSpeechRecognition() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      return;
+    }
+
+    const OriginalSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const SpeechRecognitionWrapper = function(...args) {
+      const recognizer = new OriginalSpeechRecognition(...args);
+      const originalStart = recognizer.start.bind(recognizer);
+
+      recognizer.start = function() {
+        requestMediaPermissions({ audio: true }).then(granted => {
+          if (granted) {
+            originalStart();
+          } else {
+            const errorEvent = new SpeechRecognitionErrorEvent('error');
+            errorEvent.error = 'not-allowed'; // This is the standard error for permission denial.
+            recognizer.dispatchEvent(errorEvent);
+          }
+        });
+      };
+
+      return recognizer;
+    };
+
+    SpeechRecognitionWrapper.prototype = OriginalSpeechRecognition.prototype;
+    SpeechRecognitionWrapper.prototype.constructor = SpeechRecognitionWrapper;
+
+    if (window.SpeechRecognition) {
+      window.SpeechRecognition = SpeechRecognitionWrapper;
+    }
+    if (window.webkitSpeechRecognition) {
+      window.webkitSpeechRecognition = SpeechRecognitionWrapper;
+    }
+  }
+
+  interceptSpeechRecognition();
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script ws-interception-config="{&quot;parentOrigin&quot;:&quot;https://gemini.google.com&quot;,&quot;proxiedDomains&quot;:[]}" data-bard-client-injected="true">(function(){'use strict';var u=typeof Object.defineProperties=="function"?Object.defineProperty:function(b,d,e){if(b==Array.prototype||b==Object.prototype)return b;b[d]=e.value;return b};function v(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var e=b[d];if(e&&e.Math==Math)return e}throw Error("Cannot find global object");}var w=v(this);
+function y(b,d){if(d)a:{var e=w;b=b.split(".");for(var h=0;h<b.length-1;h++){var k=b[h];if(!(k in e))break a;e=e[k]}b=b[b.length-1];h=e[b];d=d(h);d!=h&&d!=null&&u(e,b,{configurable:!0,writable:!0,value:d})}}function z(b){function d(h){return b.next(h)}function e(h){return b.throw(h)}return new Promise(function(h,k){function m(n){n.done?h(n.value):Promise.resolve(n.value).then(d,e).then(m,k)}m(b.next())})}y("globalThis",function(b){return b||w});/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+function A(b,d){function e(){}e.prototype=d.prototype;b.j=d.prototype;b.prototype=new e;b.prototype.constructor=b;b.h=function(h,k,m){for(var n=Array(arguments.length-2),p=2;p<arguments.length;p++)n[p-2]=arguments[p];return d.prototype[k].apply(h,n)}};function B(b,d,e="*"){function h(a){if(typeof a==="string")return F.encode(a).buffer;if(a instanceof ArrayBuffer)return a.slice(0);if(ArrayBuffer.isView(a))return a.buffer.slice(a.byteOffset,a.byteOffset+a.byteLength);throw Error("Invalid data type");}function k(a){a=h(a);var f={type:"send",data:new Uint8Array(a)},g;(g=r)==null||g.postMessage(f,[a])}function m(){if(!r)throw Error("Data port not captured yet.");r.onmessage=a=>{if(a.data.type==="message"){a=new MessageEvent("message",{data:G.decode(a.data.data)});
+let f;(f=c.onmessage)==null||f.call(c,a);c.dispatchEvent(a)}}}function n(){if(!t)throw Error("Control port not captured yet.");t.onmessage=a=>{switch(a.data.type){case "open":l=1;var f=new Event("open"),g;(g=c.onopen)==null||g.call(c,f);c.dispatchEvent(f);q.forEach(H=>{k(H)});q=[];break;case "close":g=a.data;l=3;g=new CloseEvent("close",{code:g.code,reason:g.reason,wasClean:g.wasClean});(f=c.onclose)==null||f.call(c,g);c.dispatchEvent(g);break;case "error":l=3;f=new Event("error");let x;(x=c.onerror)==
+null||x.call(c,f);c.dispatchEvent(f)}}}function p(a){return z(function*(){var f=new MessageChannel;t=f.port1;var g=new MessageChannel;r=g.port1;n();m();window.parent.postMessage({type:"websocket_open",portOrdering:["control","data"],url:b,protocols:a||[],connectionId:I},e,[f.port2,g.port2])}())}var c=Reflect.construct(EventTarget,[],new.target);c.CONNECTING=0;c.OPEN=1;c.CLOSING=2;c.CLOSED=3;c.url=b;c.binaryType="arraybuffer";c.protocol="";c.i="";var l=0,t=null,r=null,q=[],F=new TextEncoder,G=new TextDecoder;
+c.onopen=null;c.onmessage=null;c.onclose=null;c.onerror=null;Object.defineProperty(c,"readyState",{get:()=>l,enumerable:!0,configurable:!0});Object.defineProperty(c,"bufferedAmount",{get:()=>{var a=0;q.forEach(f=>{a+=typeof f==="string"?f.length:f.byteLength});return a},enumerable:!0,configurable:!0});var I=function(){var a;return((a=globalThis.crypto)==null?0:a.randomUUID)?globalThis.crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,f=>{var g=Math.random()*16|0;return(f===
+"x"?g:g&3|8).toString(16)})}();c.send=a=>{if(l===1)a instanceof Blob?a.arrayBuffer().then(f=>{k(f)}):k(a);else if(l===0)if(typeof a==="string")q.push(a);else if(a instanceof ArrayBuffer||ArrayBuffer.isView(a))q.push(h(a));else throw Error("Sending Blob is not supported before the connection is open.");else console.debug("WebSocket send called in CLOSING or CLOSED state; ignored.")};c.close=(a=1E3,f="")=>{if(l!==2&&l!==3){l=2;a={type:"close",code:a,reason:f,wasClean:a===1E3};var g;(g=t)==null||g.postMessage(a)}};
+Promise.resolve().then(()=>p(d));return c}A(B,EventTarget);var C=document.currentScript,D=C==null?void 0:C.getAttribute("ws-interception-config");if(!D)throw Error("WebSocket Interceptor: Missing ws-interception-config attribute in the script tag.");var E=JSON.parse(D);if(!E.parentOrigin||typeof E.parentOrigin!=="string")throw Error("WebSocket Interceptor: Invalid parentOrigin in ws-interception-config");
+(function(b){var d=Object.getOwnPropertyDescriptor(window,"WebSocket");if(!d||d.writable||d.configurable)d=Object.assign(function(e,h){try{let k=(new URL(e)).hostname;if(b.proxiedDomains.some(m=>k===m||k.endsWith(`.${m}`)))return new B(e,h,b.parentOrigin)}catch(k){throw window.parent.postMessage({type:"websocket_blocked",url:e,reason:"blocked_invalid_url"},b.parentOrigin),new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");}window.parent.postMessage({type:"websocket_blocked",
+url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");},{CONNECTING:0,OPEN:1,CLOSING:2,CLOSED:3}),Object.defineProperty(window,"WebSocket",{value:d,writable:!1,configurable:!1})})({proxiedDomains:E.proxiedDomains||[],parentOrigin:E.parentOrigin});}).call(this);
+</script><script data-bard-client-injected="true">((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageEditModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageTransformModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.ttsModelName + ':generateContent',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+  modelInformation.deprecatedImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predict',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predictLongRunning',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedGenerateImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedImageTransformModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-3-flash-preview","imageModelName":"imagen-4.0-generate-001","imageEditModelName":"gemini-3.1-flash-image","imageTransformModelName":"gemini-3-pro-image","videoModelName":"veo-2.0-generate-001","ttsModelName":"gemini-2.5-flash-preview-tts","deprecatedTextModelNames":["gemini-2.0-flash","gemini-2.5-flash","gemini-2.5-flash-preview-04-17","gemini-2.5-flash-preview-05-20","gemini-2.5-flash-preview-09-2025"],"deprecatedImageModelNames":["imagen-3.0-generate-001","imagen-3.0-generate-002"],"deprecatedGenerateImageModelNames":["gemini-2.5-flash-image-preview","gemini-2.5-flash-image","gemini-3.1-flash-image-preview"],"deprecatedImageTransformModelNames":["gemini-3-pro-image-preview-11-2025"]})</script><script data-bard-client-injected="true">(function() {
+  function normalizeSlug(str) {
+    try {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^p{L}p{N}s_-]/gu, '')
+        .replace(/s+/g, '-');
+    } catch (e) {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9s_-]/g, '')
+        .replace(/s+/g, '-');
+    }
+  }
+
+  function findTargetElement(hash) {
+    if (!hash || hash === '#') {
+      return null;
+    }
+    const rawId = hash.startsWith('#') ? hash.slice(1) : hash;
+    let decodedId = rawId;
+    try {
+      decodedId = decodeURIComponent(rawId);
+    } catch (e) {
+      // Ignore URI malformed errors.
+    }
+
+    // 1. Direct ID match (raw and decoded).
+    let target = document.getElementById(rawId) || document.getElementById(decodedId);
+    if (target) {
+      return target;
+    }
+
+    // 2. Name attribute match (<a name="...">).
+    try {
+      if (typeof CSS !== 'undefined' && CSS.escape) {
+        target =
+          document.querySelector('[name="' + CSS.escape(rawId) + '"]') ||
+          document.querySelector('[name="' + CSS.escape(decodedId) + '"]');
+      } else {
+        const namedElements = document.getElementsByName(rawId);
+        if (namedElements && namedElements.length > 0) {
+          return namedElements[0];
+        }
+      }
+    } catch (e) {
+      // Ignore querySelector syntax errors.
+    }
+    if (target) {
+      return target;
+    }
+
+    // 3. Match heading text by slug (for Markdown TOCs where headings lack explicit IDs).
+    const targetSlug = normalizeSlug(decodedId);
+    if (targetSlug) {
+      for (const heading of document.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
+        if (normalizeSlug(heading.textContent || '') === targetSlug) {
+          return heading;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  document.addEventListener('click', function(event) {
+    const target = event.target;
+    const anchor = target && typeof target.closest === 'function' ? target.closest('a') : null;
+    if (!anchor) {
+      return;
+    }
+
+    const href = anchor.getAttribute('href');
+    if (
+      !href ||
+      href.trim().toLowerCase().startsWith('javascript:') ||
+      anchor.hasAttribute('download')
+    ) {
+      return;
+    }
+
+    // Check if the link is an in-page hash / anchor link.
+    if (href.startsWith('#')) {
+      event.preventDefault();
+      const targetElement = findTargetElement(href);
+      if (targetElement) {
+        targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+      return;
+    }
+
+    // Check if the URL has the same origin/pathname but with a hash.
+    try {
+      const url = new URL(anchor.href, window.location.href);
+      if (
+        url.hash &&
+        url.origin === window.location.origin &&
+        url.pathname === window.location.pathname
+      ) {
+        event.preventDefault();
+        const targetElement = findTargetElement(url.hash);
+        if (targetElement) {
+          targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+        return;
+      }
+    } catch (e) {
+      // Fall through if URL parsing fails.
+    }
+
+    // For all external or full navigation links, prevent iframe-level navigation
+    // (which breaks in AGSA WebView or sandboxed iframes) and ensure they open
+    // safely in a new tab/window.
+    if (anchor.target !== '_blank') {
+      event.preventDefault();
+      window.open(anchor.href, '_blank', 'noopener,noreferrer');
+    }
+  }, {capture: true});
+})();</script><script data-bard-client-injected="true">(function(){'use strict';function a(){window.parent.postMessage({type:"interaction"},"*")}window.addEventListener("click",a,{capture:!0,passive:!0});window.addEventListener("touchstart",a,{capture:!0,passive:!0});window.addEventListener("keydown",a,{capture:!0,passive:!0});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MERİDYEN — Yapay Zeka, Küresel Siyaset &amp; Tarih Analizleri</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            obsidian: '#0B0D11',
+            slateCard: '#12161F',
+            slateBorder: '#1E2533',
+            accentAmber: '#F59E0B',
+            accentCyan: '#06B6D4',
+            accentEmerald: '#10B981'
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+    .font-editorial {
+      font-family: 'Playfair Display', serif;
+    }
+    .font-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0D11;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #262F40;
+      border-radius: 3px;
+    }
+    .article-prose p {
+      margin-bottom: 1.15rem;
+      line-height: 1.8;
+    }
+    .article-prose h3 {
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-top: 1.6rem;
+      margin-bottom: 0.65rem;
+    }
+  </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:JetBrains Mono, monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.bottom-5{bottom:1.25rem}.left-2\.5{left:0.625rem}.right-5{right:1.25rem}.top-0{top:0px}.top-2{top:0.5rem}.z-10{z-index:10}.z-30{z-index:30}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.my-6{margin-top:1.5rem;margin-bottom:1.5rem}.mb-0\.5{margin-bottom:0.125rem}.mb-1{margin-bottom:0.25rem}.mb-10{margin-bottom:2.5rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.ml-1{margin-left:0.25rem}.mr-1{margin-right:0.25rem}.mt-1{margin-top:0.25rem}.mt-12{margin-top:3rem}.mt-3{margin-top:0.75rem}.mt-4{margin-top:1rem}.mt-8{margin-top:2rem}.mb-2\.5{margin-bottom:0.625rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-1\.5{height:0.375rem}.h-10{height:2.5rem}.h-2{height:0.5rem}.h-2\.5{height:0.625rem}.h-3\.5{height:0.875rem}.h-4{height:1rem}.h-full{height:100%}.min-h-screen{min-height:100vh}.w-1\.5{width:0.375rem}.w-10{width:2.5rem}.w-2{width:0.5rem}.w-2\.5{width:0.625rem}.w-28{width:7rem}.w-3\.5{width:0.875rem}.w-4{width:1rem}.w-full{width:100%}.max-w-3xl{max-width:48rem}.max-w-6xl{max-width:72rem}.max-w-4xl{max-width:56rem}.flex-1{flex:1 1 0%}.flex-shrink-0{flex-shrink:0}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.cursor-pointer{cursor:pointer}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.gap-8{gap:2rem}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.whitespace-nowrap{white-space:nowrap}.whitespace-pre-line{white-space:pre-line}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-l{border-left-width:1px}.border-l-2{border-left-width:2px}.border-t{border-top-width:1px}.border-amber-400{--tw-border-opacity:1;border-color:rgb(251 191 36 / var(--tw-border-opacity, 1))}.border-amber-500\/40{border-color:rgb(245 158 11 / 0.4)}.border-amber-500\/50{border-color:rgb(245 158 11 / 0.5)}.border-emerald-500\/30{border-color:rgb(16 185 129 / 0.3)}.border-slate-700{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.border-slate-700\/80{border-color:rgb(51 65 85 / 0.8)}.border-slate-800{--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.border-slate-800\/60{border-color:rgb(30 41 59 / 0.6)}.border-slate-800\/70{border-color:rgb(30 41 59 / 0.7)}.border-slate-800\/80{border-color:rgb(30 41 59 / 0.8)}.border-slate-800\/90{border-color:rgb(30 41 59 / 0.9)}.border-amber-500\/30{border-color:rgb(245 158 11 / 0.3)}.border-cyan-500\/30{border-color:rgb(6 182 212 / 0.3)}.border-rose-500\/40{border-color:rgb(244 63 94 / 0.4)}.bg-\[\#07090C\]{--tw-bg-opacity:1;background-color:rgb(7 9 12 / var(--tw-bg-opacity, 1))}.bg-amber-400{--tw-bg-opacity:1;background-color:rgb(251 191 36 / var(--tw-bg-opacity, 1))}.bg-amber-500{--tw-bg-opacity:1;background-color:rgb(245 158 11 / var(--tw-bg-opacity, 1))}.bg-amber-500\/10{background-color:rgb(245 158 11 / 0.1)}.bg-amber-500\/20{background-color:rgb(245 158 11 / 0.2)}.bg-black\/80{background-color:rgb(0 0 0 / 0.8)}.bg-cyan-400{--tw-bg-opacity:1;background-color:rgb(34 211 238 / var(--tw-bg-opacity, 1))}.bg-emerald-400{--tw-bg-opacity:1;background-color:rgb(52 211 153 / var(--tw-bg-opacity, 1))}.bg-emerald-500{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.bg-emerald-500\/10{background-color:rgb(16 185 129 / 0.1)}.bg-emerald-500\/15{background-color:rgb(16 185 129 / 0.15)}.bg-emerald-500\/20{background-color:rgb(16 185 129 / 0.2)}.bg-emerald-500\/5{background-color:rgb(16 185 129 / 0.05)}.bg-obsidian{--tw-bg-opacity:1;background-color:rgb(11 13 17 / var(--tw-bg-opacity, 1))}.bg-obsidian\/70{background-color:rgb(11 13 17 / 0.7)}.bg-obsidian\/90{background-color:rgb(11 13 17 / 0.9)}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-800{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-slate-900\/60{background-color:rgb(15 23 42 / 0.6)}.bg-slate-900\/70{background-color:rgb(15 23 42 / 0.7)}.bg-slate-900\/80{background-color:rgb(15 23 42 / 0.8)}.bg-slate-900\/90{background-color:rgb(15 23 42 / 0.9)}.bg-slateCard{--tw-bg-opacity:1;background-color:rgb(18 22 31 / var(--tw-bg-opacity, 1))}.bg-slateCard\/90{background-color:rgb(18 22 31 / 0.9)}.bg-transparent{background-color:transparent}.bg-amber-500\/15{background-color:rgb(245 158 11 / 0.15)}.bg-cyan-500\/15{background-color:rgb(6 182 212 / 0.15)}.bg-slate-800\/90{background-color:rgb(30 41 59 / 0.9)}.bg-rose-500\/15{background-color:rgb(244 63 94 / 0.15)}.bg-gradient-to-tr{background-image:linear-gradient(to top right, var(--tw-gradient-stops))}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.from-amber-500{--tw-gradient-from:#f59e0b var(--tw-gradient-from-position);--tw-gradient-to:rgb(245 158 11 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-\[\#141A26\]{--tw-gradient-from:#141A26 var(--tw-gradient-from-position);--tw-gradient-to:rgb(20 26 38 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.via-rose-500{--tw-gradient-to:rgb(244 63 94 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #f43f5e var(--tw-gradient-via-position), var(--tw-gradient-to)}.via-\[\#10141D\]{--tw-gradient-to:rgb(16 20 29 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #10141D var(--tw-gradient-via-position), var(--tw-gradient-to)}.to-purple-600{--tw-gradient-to:#9333ea var(--tw-gradient-to-position)}.to-\[\#0B0D11\]{--tw-gradient-to:#0B0D11 var(--tw-gradient-to-position)}.p-0\.5{padding:0.125rem}.p-1\.5{padding:0.375rem}.p-2\.5{padding:0.625rem}.p-3{padding:0.75rem}.p-3\.5{padding:0.875rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-1\.5{padding-left:0.375rem;padding-right:0.375rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.py-8{padding-top:2rem;padding-bottom:2rem}.pb-1{padding-bottom:0.25rem}.pb-2{padding-bottom:0.5rem}.pl-4{padding-left:1rem}.pl-8{padding-left:2rem}.pr-3{padding-right:0.75rem}.pt-1{padding-top:0.25rem}.pt-2{padding-top:0.5rem}.pt-3{padding-top:0.75rem}.pt-6{padding-top:1.5rem}.pt-4{padding-top:1rem}.font-sans{font-family:Inter, sans-serif}.text-2xl{font-size:1.5rem;line-height:2rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xs{font-size:0.75rem;line-height:1rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.tracking-tight{letter-spacing:-0.025em}.tracking-wider{letter-spacing:0.05em}.text-amber-300{--tw-text-opacity:1;color:rgb(252 211 77 / var(--tw-text-opacity, 1))}.text-amber-300\/90{color:rgb(252 211 77 / 0.9)}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.text-cyan-400{--tw-text-opacity:1;color:rgb(34 211 238 / var(--tw-text-opacity, 1))}.text-emerald-300{--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-purple-400{--tw-text-opacity:1;color:rgb(192 132 252 / var(--tw-text-opacity, 1))}.text-sky-400{--tw-text-opacity:1;color:rgb(56 189 248 / var(--tw-text-opacity, 1))}.text-slate-100{--tw-text-opacity:1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}.text-slate-200{--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.text-slate-950{--tw-text-opacity:1;color:rgb(2 6 23 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-cyan-300{--tw-text-opacity:1;color:rgb(103 232 249 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-rose-300{--tw-text-opacity:1;color:rgb(253 164 175 / var(--tw-text-opacity, 1))}.underline{-webkit-text-decoration-line:underline;text-decoration-line:underline}.placeholder-slate-500::placeholder{--tw-placeholder-opacity:1;color:rgb(100 116 139 / var(--tw-placeholder-opacity, 1))}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.selection\:bg-amber-500\/30 *::selection{background-color:rgb(245 158 11 / 0.3)}.selection\:text-amber-200 *::selection{--tw-text-opacity:1;color:rgb(253 230 138 / var(--tw-text-opacity, 1))}.selection\:bg-amber-500\/30::selection{background-color:rgb(245 158 11 / 0.3)}.selection\:text-amber-200::selection{--tw-text-opacity:1;color:rgb(253 230 138 / var(--tw-text-opacity, 1))}.hover\:border-amber-500\/50:hover{border-color:rgb(245 158 11 / 0.5)}.hover\:border-slate-700:hover{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.hover\:bg-amber-400:hover{--tw-bg-opacity:1;background-color:rgb(251 191 36 / var(--tw-bg-opacity, 1))}.hover\:bg-emerald-400:hover{--tw-bg-opacity:1;background-color:rgb(52 211 153 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-700:hover{--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-800\/60:hover{background-color:rgb(30 41 59 / 0.6)}.hover\:text-amber-400:hover{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.hover\:text-slate-200:hover{--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.hover\:text-slate-400:hover{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.hover\:text-amber-300:hover{--tw-text-opacity:1;color:rgb(252 211 77 / var(--tw-text-opacity, 1))}.hover\:underline:hover{-webkit-text-decoration-line:underline;text-decoration-line:underline}.focus\:border-amber-500\/60:focus{border-color:rgb(245 158 11 / 0.6)}.focus\:border-emerald-400:focus{--tw-border-opacity:1;border-color:rgb(52 211 153 / var(--tw-border-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}@media (min-width: 640px){.sm\:w-56{width:14rem}.sm\:flex-initial{flex:0 1 auto}.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.sm\:flex-row{flex-direction:row}.sm\:p-6{padding:1.5rem}.sm\:p-8{padding:2rem}.sm\:pb-0{padding-bottom:0px}.sm\:text-3xl{font-size:1.875rem;line-height:2.25rem}.sm\:text-base{font-size:1rem;line-height:1.5rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}.sm\:text-4xl{font-size:2.25rem;line-height:2.5rem}.sm\:text-xl{font-size:1.25rem;line-height:1.75rem}}@media (min-width: 768px){.md\:inline{display:inline}.md\:flex-row{flex-direction:row}.md\:items-center{align-items:center}.md\:justify-between{justify-content:space-between}}@media (min-width: 1024px){.lg\:col-span-4{grid-column:span 4 / span 4}.lg\:col-span-8{grid-column:span 8 / span 8}.lg\:inline{display:inline}.lg\:grid-cols-12{grid-template-columns:repeat(12, minmax(0, 1fr))}}</style></head>
+<body class="bg-obsidian text-slate-100 min-h-screen flex flex-col selection:bg-amber-500/30 selection:text-amber-200">
+
+  <!-- ÜST STÜDYO ÇUBUĞU: CANLI İSİM SEÇİCİ & TEK TIKLA NETLIFY API DEPLOY -->
+  
+
+  <!-- ANA HEADER -->
+  <header class="border-b border-slate-800/80 sticky top-0 z-30 backdrop-blur-md bg-obsidian/90 transition-colors" id="mainHeader">
+    <div class="max-w-6xl mx-auto px-4 py-4">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <!-- Logo & Slogan -->
+        <div>
+          <div class="flex items-center gap-3">
+            <a href="#top" id="logoResetLink" class="text-2xl sm:text-3xl font-editorial font-bold tracking-tight text-white flex items-center gap-2">
+              <span id="brandTitleDisplay">MERİDYEN</span>
+              <span class="text-xs font-code font-normal px-2 py-0.5 rounded bg-slate-800 text-amber-400 border border-slate-700" id="brandDomainDisplay">dapperpasha.github.io/kisiseldeneyim.github.io</span>
+            </a>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1" id="brandTaglineDisplay">Yapay Zeka Eşiği, Küresel Jeopolitik (ABD • Çin • Rusya • Ukrayna • Türkiye) ve Tarihsel Kırılmalar</p>
+        </div>
+
+        <!-- Sağ Aksiyonlar -->
+        <div class="flex items-center flex-wrap gap-2">
+          <div class="relative flex-1 sm:flex-initial">
+            <input id="searchInput" type="text" placeholder="Yazılarda veya ülkelerde ara..." class="w-full sm:w-56 bg-slate-900/90 border border-slate-700/80 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/60">
+            <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+
+          <button type="button" id="savedFilterBtn" class="px-3 py-1.5 rounded-lg border border-slate-700/80 bg-slate-900/80 hover:border-amber-500/50 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition">
+            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+            </svg>
+            <span>Arşivim</span>
+            <span id="savedCountBadge" class="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 font-code text-[10px]">0</span>
+          </button>
+
+          
+
+          <button type="button" id="themeToggleBtn" title="Görünüm Modunu Değiştir" class="p-1.5 rounded-lg border border-slate-700/80 bg-slate-900/80 text-slate-300 hover:text-amber-400 transition">
+            <svg id="themeIconSun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+            <svg id="themeIconMoon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- KATEGORİ VE ÜLKE RADARI -->
+      <div class="mt-4 pt-3 border-t border-slate-800/60 flex flex-wrap items-center justify-between gap-3">
+        <!-- Ana Kategoriler -->
+        <nav class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0" id="categoryTabs">
+          <button type="button" data-category="all" class="cat-tab px-3 py-1.5 rounded-md text-xs font-medium transition bg-slate-100 text-slate-900">
+            Tüm Dosyalar (4)
+          </button>
+          <button type="button" data-category="ai" class="cat-tab px-3 py-1.5 rounded-md text-xs font-medium transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+            Yapay Zeka
+          </button>
+          <button type="button" data-category="geopolitics" class="cat-tab px-3 py-1.5 rounded-md text-xs font-medium transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            Küresel Siyaset
+          </button>
+          <button type="button" data-category="history" class="cat-tab px-3 py-1.5 rounded-md text-xs font-medium transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            Tarih Köşesi
+          </button>
+        </nav>
+
+        <!-- Ülke Odak Filtreleri -->
+        <div class="flex items-center gap-1 flex-wrap" id="countryFilterBar">
+          <span class="text-[11px] font-code text-slate-500 mr-1">ÜLKE RADARI:</span>
+          <button type="button" data-country="all" class="country-pill px-2 py-0.5 rounded text-[11px] font-code border border-amber-500/40 bg-amber-500/10 text-amber-300">
+            Tümü
+          </button>
+          <button type="button" data-country="ABD" class="country-pill px-2 py-0.5 rounded text-[11px] font-code border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-slate-200">
+            ABD
+          </button>
+          <button type="button" data-country="Çin" class="country-pill px-2 py-0.5 rounded text-[11px] font-code border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-slate-200">
+            Çin
+          </button>
+          <button type="button" data-country="Rusya" class="country-pill px-2 py-0.5 rounded text-[11px] font-code border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-slate-200">
+            Rusya
+          </button>
+          <button type="button" data-country="Ukrayna" class="country-pill px-2 py-0.5 rounded text-[11px] font-code border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-slate-200">
+            Ukrayna
+          </button>
+          <button type="button" data-country="Türkiye" class="country-pill px-2 py-0.5 rounded text-[11px] font-code border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-slate-200">
+            Türkiye
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CANLI JEOPOLİTİK & YZ DURUM BANDI -->
+  <div class="bg-slate-900/60 border-b border-slate-800/70 py-2 px-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-4 text-xs overflow-x-auto whitespace-nowrap">
+      <div class="flex items-center gap-6">
+        <span class="font-code text-amber-400 font-semibold flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          KASIM 2026 GÜNDEM ÖZETİ:
+        </span>
+        <span class="text-slate-300">
+          <strong class="text-white">Shenzhen Zirvesi (19 Kasım):</strong> Trump, Şi ve Putin ilk kez üçlü masada buluşuyor
+        </span>
+        <span class="text-slate-600">|</span>
+        <span class="text-slate-300">
+          <strong class="text-cyan-400">YZ Güvenliği:</strong> OpenAI, Anthropic ve 6 ülke Paris Bildirisi'ni imzaladı
+        </span>
+        <span class="text-slate-600">|</span>
+        <span class="text-slate-300">
+          <strong class="text-emerald-400">Ankara Hattı:</strong> Türkiye-Katar 12. Stratejik Komite Bildirisi yayımlandı
+        </span>
+      </div>
+      <span class="font-code text-[11px] text-slate-400 hidden lg:inline">SON GÜNCELLEME: 14 KASIM 2026</span>
+    </div>
+  </div>
+
+  <!-- ANA İÇERİK ALANI -->
+  <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full">
+
+    <!-- MANŞET (HERO) DOSYASI -->
+    <section id="heroSection" class="mb-10">
+        <div class="relative rounded-2xl border border-slate-800 bg-gradient-to-br from-[#141A26] via-[#10141D] to-[#0B0D11] p-6 sm:p-8 shadow-xl overflow-hidden">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-code font-medium border bg-amber-500/15 text-amber-300 border-amber-500/30">
+                HAFTANIN MANŞET DOSYASI • KÜRESEL SIYASET
+              </span>
+              <span class="text-xs font-code text-slate-400">14 Kasım 2026 • 6 dk okuma</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="px-2 py-0.5 rounded bg-slate-800/90 border border-slate-700 text-[11px] font-code text-slate-300">ABD</span><span class="px-2 py-0.5 rounded bg-slate-800/90 border border-slate-700 text-[11px] font-code text-slate-300">Çin</span><span class="px-2 py-0.5 rounded bg-slate-800/90 border border-slate-700 text-[11px] font-code text-slate-300">Rusya</span><span class="px-2 py-0.5 rounded bg-slate-800/90 border border-slate-700 text-[11px] font-code text-slate-300">Ukrayna</span>
+            </div>
+          </div>
+
+          <h1 class="text-2xl sm:text-4xl font-editorial font-bold text-white leading-tight mb-3 cursor-pointer hover:text-amber-300 transition" data-open-article="shenzhen-uclu-zirve-2026">
+            Shenzhen’de Tarihi Masa: Trump, Şi ve Putin 19 Kasım’da İlk Kez Üçlü Zirvede Buluşuyor
+          </h1>
+
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed max-w-4xl mb-6">
+            Beyaz Saray doğruladı: Şubat 2026’da sona eren New START anlaşmasının ardından ABD, Çin ve Rusya liderleri APEC Zirvesi kapsamında nükleer silahların azaltılması gündemiyle ilk kez aynı masaya oturuyor.
+          </p>
+
+          <div class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-800/80">
+            <div class="flex items-center gap-3">
+              <button type="button" data-open-article="shenzhen-uclu-zirve-2026" class="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs transition flex items-center gap-1.5">
+                <span>Dosyayı Oku &amp; Kaynakları İncele</span>
+                <span>→</span>
+              </button>
+              <button type="button" data-toggle-save="shenzhen-uclu-zirve-2026" class="px-3 py-2 rounded-lg border border-slate-700 bg-slate-900/70 hover:border-amber-500/50 text-xs text-slate-200 transition">
+                ☆ Arşive Kaydet
+              </button>
+            </div>
+            <div class="text-xs text-slate-400 font-code">
+              Doğrulanmış Kaynaklar: Ekonomim, Milliyet, AA
+            </div>
+          </div>
+        </div>
+      </section>
+
+    <!-- MAKALE IZGARASI & YAN PANEL -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Sol: Makale Kartları (8 Sütun) -->
+      <div class="lg:col-span-8">
+        <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-800">
+          <h2 class="text-sm font-code uppercase tracking-wider text-slate-400" id="gridSectionTitle">
+            SON ANALİZLER &amp; DOSYALAR
+          </h2>
+          <span class="text-xs font-code text-slate-500" id="articleCountLabel">4 yazı listeleniyor</span>
+        </div>
+
+        <div id="articlesGrid" class="space-y-5">
+          <article class="rounded-xl border border-slate-800/90 bg-slateCard/90 hover:border-slate-700 p-5 transition shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-md text-[11px] font-code border bg-amber-500/15 text-amber-300 border-amber-500/30">
+                  Küresel Siyaset
+                </span>
+                <span class="text-xs font-code text-slate-400">14 Kasım 2026</span>
+                <span class="text-slate-600">•</span>
+                <span class="text-xs font-code text-slate-400">6 dk okuma</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="px-2 py-0.5 rounded bg-obsidian border border-slate-800 text-[10px] font-code text-slate-300">ABD</span><span class="px-2 py-0.5 rounded bg-obsidian border border-slate-800 text-[10px] font-code text-slate-300">Çin</span><span class="px-2 py-0.5 rounded bg-obsidian border border-slate-800 text-[10px] font-code text-slate-300">Rusya</span><span class="px-2 py-0.5 rounded bg-obsidian border border-slate-800 text-[10px] font-code text-slate-300">Ukrayna</span>
+              </div>
+            </div>
+
+            <h3 class="text-lg sm:text-xl font-editorial font-bold text-white hover:text-amber-300 cursor-pointer transition mb-2" data-open-article="shenzhen-uclu-zirve-2026">
+              Shenzhen’de Tarihi Masa: Trump, Şi ve Putin 19 Kasım’da İlk Kez Üçlü Zirvede Buluşuyor
+            </h3>
+
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
+              Beyaz Saray doğruladı: Şubat 2026’da sona eren New START anlaşmasının ardından ABD, Çin ve Rusya liderleri APEC Zirvesi kapsamında nükleer silahların azaltılması gündemiyle ilk kez aynı masaya oturuyor.
+            </p>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/70 text-xs">
+              <div class="flex items-center gap-2">
+                <button type="button" data-open-article="shenzhen-uclu-zirve-2026" class="text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1">
+                  <span>Tam Metni Oku</span>
+                  <span>→</span>
+                </button>
+                <span class="text-slate-700">|</span>
+                <button type="button" data-copy-summary="shenzhen-uclu-zirve-2026" class="text-slate-400 hover:text-slate-200 font-code text-[11px]">
+                  IG Özeti Kopyala
+                </button>
+              </div>
+
+              <button type="button" data-toggle-save="shenzhen-uclu-zirve-2026" class="font-code text-[11px] text-slate-400 hover:text-slate-200">
+                ☆ Kaydet
+              </button>
+            </div>
+          </article>
+        
+          <article class="rounded-xl border border-slate-800/90 bg-slateCard/90 hover:border-slate-700 p-5 transition shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-md text-[11px] font-code border bg-cyan-500/15 text-cyan-300 border-cyan-500/30">
+                  Yapay Zeka
+                </span>
+                <span class="text-xs font-code text-slate-400">13 Kasım 2026</span>
+                <span class="text-slate-600">•</span>
+                <span class="text-xs font-code text-slate-400">5 dk okuma</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="px-2 py-0.5 rounded bg-obsidian border border-slate-800 text-[10px] font-code text-slate-300">ABD</span>
+              </div>
+            </div>
+
+            <h3 class="text-lg sm:text-xl font-editorial font-bold text-white hover:text-amber-300 cursor-pointer transition mb-2" data-open-article="paris-yapay-zeka-cagrisi-kasim-2026">
+              Paris Yapay Zeka Güvenliği Çağrısı, AlphaGenome 2 ve Öz-Gelişim Eşiği: Kasım 2026 Raporu
+            </h3>
+
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
+              OpenAI, Anthropic, Microsoft ve Mistral dahil 10 dev şirket ile 6 ülke "Paris Çağrısı"na imza atarken, laboratuvarlarda araştırma hızını ikiye katlayan modeller ve biyoteknolojide AlphaGenome 2 sahneye çıktı.
+            </p>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/70 text-xs">
+              <div class="flex items-center gap-2">
+                <button type="button" data-open-article="paris-yapay-zeka-cagrisi-kasim-2026" class="text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1">
+                  <span>Tam Metni Oku</span>
+                  <span>→</span>
+                </button>
+                <span class="text-slate-700">|</span>
+                <button type="button" data-copy-summary="paris-yapay-zeka-cagrisi-kasim-2026" class="text-slate-400 hover:text-slate-200 font-code text-[11px]">
+                  IG Özeti Kopyala
+                </button>
+              </div>
+
+              <button type="button" data-toggle-save="paris-yapay-zeka-cagrisi-kasim-2026" class="font-code text-[11px] text-slate-400 hover:text-slate-200">
+                ☆ Kaydet
+              </button>
+            </div>
+          </article>
+        
+          <article class="rounded-xl border border-slate-800/90 bg-slateCard/90 hover:border-slate-700 p-5 transition shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-md text-[11px] font-code border bg-amber-500/15 text-amber-300 border-amber-500/30">
+                  Küresel Siyaset
+                </span>
+                <span class="text-xs font-code text-slate-400">13 Kasım 2026</span>
+                <span class="text-slate-600">•</span>
+                <span class="text-xs font-code text-slate-400">5 dk okuma</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="px-2 py-0.5 rounded bg-obsidian border border-slate-800 text-[10px] font-code text-slate-300">Türkiye</span>
+              </div>
+            </div>
+
+            <h3 class="text-lg sm:text-xl font-editorial font-bold text-white hover:text-amber-300 cursor-pointer transition mb-2" data-open-article="ankara-kasim-2026-diplomasisi">
+              Ankara’nın Kasım 2026 Diplomasisi: Türkiye-Katar 12. Stratejik Komitesi, Kıbrıs ve Bölgesel Denge
+            </h3>
+
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
+              İstanbul’da imzalanan Türkiye-Katar 12. Yüksek Stratejik Komite Ortak Bildirisi’nden Kıbrıs’ta yeni sınır kapıları müzakerelerine ve Orta Doğu geriliminde İncirlik tartışmalarına kadar Ankara’nın yoğun gündemi.
+            </p>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/70 text-xs">
+              <div class="flex items-center gap-2">
+                <button type="button" data-open-article="ankara-kasim-2026-diplomasisi" class="text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1">
+                  <span>Tam Metni Oku</span>
+                  <span>→</span>
+                </button>
+                <span class="text-slate-700">|</span>
+                <button type="button" data-copy-summary="ankara-kasim-2026-diplomasisi" class="text-slate-400 hover:text-slate-200 font-code text-[11px]">
+                  IG Özeti Kopyala
+                </button>
+              </div>
+
+              <button type="button" data-toggle-save="ankara-kasim-2026-diplomasisi" class="font-code text-[11px] text-slate-400 hover:text-slate-200">
+                ☆ Kaydet
+              </button>
+            </div>
+          </article>
+        
+          <article class="rounded-xl border border-slate-800/90 bg-slateCard/90 hover:border-slate-700 p-5 transition shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-md text-[11px] font-code border bg-emerald-500/15 text-emerald-300 border-emerald-500/30">
+                  Tarih Köşesi
+                </span>
+                <span class="text-xs font-code text-slate-400">14 Kasım 2026</span>
+                <span class="text-slate-600">•</span>
+                <span class="text-xs font-code text-slate-400">7 dk okuma</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="px-2 py-0.5 rounded bg-obsidian border border-slate-800 text-[10px] font-code text-slate-300">Çin</span><span class="px-2 py-0.5 rounded bg-obsidian border border-slate-800 text-[10px] font-code text-slate-300">Rusya</span><span class="px-2 py-0.5 rounded bg-obsidian border border-slate-800 text-[10px] font-code text-slate-300">ABD</span>
+              </div>
+            </div>
+
+            <h3 class="text-lg sm:text-xl font-editorial font-bold text-white hover:text-amber-300 cursor-pointer transition mb-2" data-open-article="sogd-turk-kervanlarindan-kutup-ipek-yoluna">
+              Soğd-Türk Kervanlarından "Kutup İpek Yolu"na: Ticaret Koridorları İmparatorlukları Nasıl Kurup Yıkar?
+            </h3>
+
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
+              4. yüzyıldan 8. yüzyıla kadar Avrasya ticaretini domine eden karma Soğd-Türk kervan ağlarından, bugünün çip ambargolarına ve eriyen buzullarla açılan Arktik ticaret rotalarına uzanan tarihsel süreklilik.
+            </p>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/70 text-xs">
+              <div class="flex items-center gap-2">
+                <button type="button" data-open-article="sogd-turk-kervanlarindan-kutup-ipek-yoluna" class="text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1">
+                  <span>Tam Metni Oku</span>
+                  <span>→</span>
+                </button>
+                <span class="text-slate-700">|</span>
+                <button type="button" data-copy-summary="sogd-turk-kervanlarindan-kutup-ipek-yoluna" class="text-slate-400 hover:text-slate-200 font-code text-[11px]">
+                  IG Özeti Kopyala
+                </button>
+              </div>
+
+              <button type="button" data-toggle-save="sogd-turk-kervanlarindan-kutup-ipek-yoluna" class="font-code text-[11px] text-slate-400 hover:text-slate-200">
+                ☆ Kaydet
+              </button>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Sağ: Instagram Bio Önizleme + Otomatik Güncelleme Mimarisi (4 Sütun) -->
+      <aside class="lg:col-span-4 space-y-6">
+        <!-- Instagram Bio Canlı Kartı -->
+        
+
+        <!-- 5 Ülke Jeopolitik Nabız Özeti -->
+        <div class="rounded-xl border border-slate-800 bg-slateCard/90 p-5">
+          <h3 class="text-xs font-code uppercase tracking-wider text-slate-300 font-semibold mb-3">
+            5 ÜLKE GÜÇ RADARI (KASIM 2026)
+          </h3>
+          <div class="space-y-3 text-xs">
+            <div class="p-2.5 rounded-lg bg-obsidian/70 border border-slate-800/80">
+              <div class="flex items-center justify-between font-medium text-white mb-0.5">
+                <span>🇺🇸 ABD &amp; 🇨🇳 Çin &amp; 🇷🇺 Rusya</span>
+                <span class="text-[10px] font-code text-amber-400">19 Kasım 2026</span>
+              </div>
+              <p class="text-slate-400 text-[11px] leading-relaxed">
+                Shenzhen APEC Zirvesi'nde ilk üçlü liderler zirvesi. Odak: Şubat 2026'da biten New START sonrası nükleer silah kontrolü.
+              </p>
+            </div>
+
+            <div class="p-2.5 rounded-lg bg-obsidian/70 border border-slate-800/80">
+              <div class="flex items-center justify-between font-medium text-white mb-0.5">
+                <span>🇺🇦 Ukrayna</span>
+                <span class="text-[10px] font-code text-cyan-400">Diplomatik Denklem</span>
+              </div>
+              <p class="text-slate-400 text-[11px] leading-relaxed">
+                Beyaz Saray, Shenzhen'deki üçlü nükleer zirvede Ukrayna savaşının doğrudan gündeme alınmasının beklenmediğini açıkladı.
+              </p>
+            </div>
+
+            <div class="p-2.5 rounded-lg bg-obsidian/70 border border-slate-800/80">
+              <div class="flex items-center justify-between font-medium text-white mb-0.5">
+                <span>🇹🇷 Türkiye</span>
+                <span class="text-[10px] font-code text-emerald-400">Çok Yönlü Diplomasi</span>
+              </div>
+              <p class="text-slate-400 text-[11px] leading-relaxed">
+                İstanbul'da Türkiye-Katar 12. Yüksek Stratejik Komite bildirisi, Kıbrıs'ta yeni sınır kapıları diplomasisi ve bölgesel denge.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tek Tıkla Netlify API Köprüsü Kartı -->
+        
+      </aside>
+    </div>
+  </main>
+
+  <!-- MAKALE OKUMA MODALI -->
+  <div id="articleModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm overflow-y-auto p-4 sm:p-6">
+    <div class="max-w-3xl mx-auto my-6 bg-slateCard border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden">
+      <!-- Modal Üst Bar -->
+      <div class="flex items-center justify-between px-6 py-4 bg-obsidian/90 border-b border-slate-800 sticky top-0 z-10">
+        <div class="flex items-center gap-2" id="modalCategoryBadge"></div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="modalCopySummaryBtn" class="px-3 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-code transition">
+            IG Story Özeti Kopyala
+          </button>
+          <button type="button" id="closeArticleModalBtn" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal İçerik -->
+      <div class="p-6 sm:p-8">
+        <div class="flex flex-wrap items-center gap-2 text-xs font-code text-slate-400 mb-3" id="modalMetaInfo"></div>
+        <h1 class="text-2xl sm:text-3xl font-editorial font-bold text-white leading-tight mb-4" id="modalArticleTitle"></h1>
+        <p class="text-sm sm:text-base text-amber-300/90 font-medium border-l-2 border-amber-400 pl-4 py-1 mb-6" id="modalArticleDeck"></p>
+
+        <div class="article-prose text-slate-200 text-sm sm:text-base" id="modalArticleBody"></div>
+
+        <!-- Doğrulanmış Kaynaklar Kutusu -->
+        <div class="mt-8 pt-6 border-t border-slate-800">
+          <h4 class="text-xs font-code uppercase tracking-wider text-slate-400 mb-3">
+            DOĞRULANMIŞ BİRİNCİL KAYNAKLAR &amp; REFERANSLAR
+          </h4>
+          <ul class="space-y-2 text-xs" id="modalSourcesList"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NETLIFY API DEPLOY VE IG BİO MODALI -->
+  
+
+  <!-- BİLDİRİM TOAST -->
+  <div id="toastNotice" class="fixed bottom-5 right-5 z-50 hidden px-4 py-2.5 rounded-xl bg-amber-500 text-slate-950 font-semibold text-xs shadow-lg">
+    Panoya kopyalandı!
+  </div>
+
+  <!-- ALT BİLGİ (FOOTER) -->
+  <footer class="border-t border-slate-800/80 py-6 px-4 text-xs text-slate-500 mt-12">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div>
+        <span class="font-editorial font-bold text-slate-300" id="footerBrandName">MERİDYEN</span> — Bağımsız Yapay Zeka, Jeopolitik ve Tarih Analiz Platformu (Kasım 2026)
+      </div>
+      <div class="flex items-center gap-3 font-code text-[11px]">
+        <span>dapperpasha.github.io/kisiseldeneyim.github.io</span>
+        
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // MARKA & İSİM KONSEPTLERİ
+    const BRAND_PRESETS = {
+      meridyen: {
+        name: 'MERİDYEN',
+        domain: 'dapperpasha.github.io/kisiseldeneyim.github.io',
+        tagline: 'Yapay Zeka Eşiği, Küresel Jeopolitik (ABD • Çin • Rusya • Ukrayna • Türkiye) ve Tarihsel Kırılmalar',
+        bio: '⚡ Yapay Zeka, Küresel Siyaset & Tarih Analizleri\n🌍 ABD • Çin • Rusya • Ukrayna • Türkiye\n👇 Haftalık derin dosyalar ve arşiv:'
+      },
+      kadimkod: {
+        name: 'KADİM & KOD',
+        domain: 'dapperpasha.github.io/kisiseldeneyim.github.io',
+        tagline: 'Algoritmadan İmparatorluklara: Yapay Zeka, 5 Ülke Güç Dengesi ve Tarih Köşesi',
+        bio: '🧠 Algoritmadan İmparatorluklara: Kadim & Kod\n🌐 Yapay Zeka • Jeopolitik • Tarih Arşivi\n👇 Güncel analizleri okumak için:'
+      },
+      eksen: {
+        name: 'EKSEN',
+        domain: 'dapperpasha.github.io/kisiseldeneyim.github.io',
+        tagline: 'Çok Kutuplu Dünya Analizleri, Yapay Zeka Devrimi ve Tarihsel Perspektif',
+        bio: '🧭 Çok Kutuplu Dünya & Yapay Zeka Analizleri\n⚡ ABD-Çin-Rusya-Ukrayna-Türkiye Hattı & Tarih\n👇 Son dosyalar:'
+      },
+      stratum: {
+        name: 'STRATUM',
+        domain: 'dapperpasha.github.io/kisiseldeneyim.github.io',
+        tagline: 'Derin Teknoloji, Jeopolitik Satranç ve Tarihin Görünmeyen Katmanları',
+        bio: '🏛️ Derin Teknoloji, Güç Dengeleri ve Tarihsel Katmanlar\n🔬 Yapay Zeka • Küresel Siyaset • Tarih\n👇 Haftalık bülten ve arşiv:'
+      }
+    };
+
+    // DOĞRULANMIŞ KASIM 2026 MAKALELERİ
+    const ARTICLES = [
+      {
+        id: 'shenzhen-uclu-zirve-2026',
+        featured: true,
+        category: 'geopolitics',
+        categoryLabel: 'Küresel Siyaset',
+        countries: ['ABD', 'Çin', 'Rusya', 'Ukrayna'],
+        date: '14 Kasım 2026',
+        readTime: '6 dk okuma',
+        title: 'Shenzhen’de Tarihi Masa: Trump, Şi ve Putin 19 Kasım’da İlk Kez Üçlü Zirvede Buluşuyor',
+        deck: 'Beyaz Saray doğruladı: Şubat 2026’da sona eren New START anlaşmasının ardından ABD, Çin ve Rusya liderleri APEC Zirvesi kapsamında nükleer silahların azaltılması gündemiyle ilk kez aynı masaya oturuyor.',
+        summaryForIg: '📌 19 Kasım 2026’da Çin’in teknoloji üssü Shenzhen’de tarihi ilk: Trump, Şi ve Putin aynı masada buluşuyor. Ana gündem nükleer silah kontrolü; Ukrayna ise üçlü masanın dışında tutuldu.',
+        body: `
+          <p>Küresel güç dengelerinde Soğuk Savaş sonrası dönemin en kritik diplomatik kırılmalarından biri önümüzdeki hafta Çin'in teknoloji merkezi Shenzhen'de yaşanacak. Beyaz Saray Basın Sözcüsü Yardımcısı Olivia Wales tarafından 14 Kasım 2026'da yapılan resmi açıklamaya göre ABD Başkanı Donald Trump, Çin Devlet Başkanı Xi Jinping ve Rusya Devlet Başkanı Vladimir Putin, Asya-Pasifik Ekonomik İşbirliği (APEC) Zirvesi marjında <strong>19 Kasım Perşembe</strong> günü ilk kez üçlü bir zirvede bir araya gelecek.</p>
+
+          <h3>Diplomatik Takvim: Manila'dan Shenzhen'e</h3>
+          <p>Beyaz Saray'ın paylaştığı takvime göre Başkan Trump, 16 Kasım Pazartesi günü Filipinler'i de kapsayan 4 günlük Asya turuna çıkacak. 17 Kasım Salı günü Güneydoğu Asya Ülkeleri Birliği'nin (ASEAN) 49. Zirvesi'ne katıldıktan sonra 18 Kasım Çarşamba günü Çin'in Shenzhen kentine geçecek ve 19 Kasım'da Putin ve Şi ile üçlü masaya oturacak.</p>
+
+          <h3>Neden Şimdi? Şubat 2026'da Sona Eren New START Boşluğu</h3>
+          <p>Zirvenin ana omurgasını <strong>nükleer silahların azaltılması</strong> oluşturuyor. ABD ile Rusya arasındaki Yeni Stratejik Silah Azaltma Anlaşması (New START), Şubat 2026'da resmen sona ermiş ve dünyanın en büyük iki nükleer cephaneliğini denetim mekanizmasından yoksun bırakmıştı. Stockholm Uluslararası Barış Araştırma Enstitüsü (SIPRI) verilerine göre en fazla nükleer savaş başlığına sahip ülke konumundaki Rusya'yı ABD ve hızla envanterini genişleten Çin takip ediyor. Pekin yönetimi yıllardır ABD ve Rusya'nın devasa stoklarını gerekçe göstererek ikili müzakerelere direniyordu; ancak Trump yönetimi Çin'in de dahil edildiği üçlü bir çerçeveyi masaya sürdü.</p>
+
+          <h3>Ukrayna Masada Yok, Orta Doğu Gündemde</h3>
+          <p>Zirvenin en dikkat çekici jeopolitik detayı ise hangi dosyaların masada olup olmayacağı. Beyaz Saray açıklamasına göre görüşmede ABD ve İsrail'in İran'a karşı yürüttüğü savaşın gündeme gelmesi beklenirken, <strong>Rusya'nın Ukrayna'daki savaşının bu üçlü toplantıda doğrudan ele alınması beklenmiyor.</strong> Bu durum, Washington'ın stratejik nükleer istikrar dosyasını Doğu Avrupa cephesinden ayrıştırarak Pekin ve Moskova ile ayrı bir pazarlık katmanı açtığını gösteriyor.</p>
+        `,
+        sources: [
+          {
+            title: 'Ekonomim — Dünyanın gözü bu zirvede olacak! Trump, Xi ve Putin buluşuyor: Gündem nükleer silahlar (14 Kasım 2026)',
+            url: 'https://www.ekonomim.com/kuresel-ekonomi/dunyanin-gozu-bu-zirvede-olacak-trump-xi-ve-putin-bulusuyor-gundem-nukleer-silahlar-haberi-931270'
+          },
+          {
+            title: 'Milliyet — ABD-Çin-Rusya hattında bir ilk! Gözler 19 Kasım\'da (14 Kasım 2026)',
+            url: 'https://www.milliyet.com.tr/dunya/son-dakika-abd-cin-rusya-hattinda-bir-ilk-gozler-19-kasimda-7700557'
+          },
+          {
+            title: 'Anadolu Ajansı — Rusya, Çin ve ABD\'nin üçlü toplantı gündemi',
+            url: 'https://www.aa.com.tr/tr/dunya/rusya-ukrayna-konusunda-rusya-cin-ve-abdnin-uclu-toplantiya-ilgisi-var/4094371'
+          }
+        ]
+      },
+      {
+        id: 'paris-yapay-zeka-cagrisi-kasim-2026',
+        featured: false,
+        category: 'ai',
+        categoryLabel: 'Yapay Zeka',
+        countries: ['ABD'],
+        date: '13 Kasım 2026',
+        readTime: '5 dk okuma',
+        title: 'Paris Yapay Zeka Güvenliği Çağrısı, AlphaGenome 2 ve Öz-Gelişim Eşiği: Kasım 2026 Raporu',
+        deck: 'OpenAI, Anthropic, Microsoft ve Mistral dahil 10 dev şirket ile 6 ülke "Paris Çağrısı"na imza atarken, laboratuvarlarda araştırma hızını ikiye katlayan modeller ve biyoteknolojide AlphaGenome 2 sahneye çıktı.',
+        summaryForIg: '🤖 Yapay zekada Kasım 2026 kırılması: OpenAI, Anthropic ve 6 ülke Paris Güvenlik Bildirisi’ni imzaladı. DeepMind ise DNA farklılıklarını hücre bazında analiz eden AlphaGenome 2’yi duyurdu.',
+        body: `
+          <p>Kasım 2026 itibarıyla yapay zeka ekosistemi hem model yeteneklerinde hem de küresel regülasyon cephesinde kritik bir eşiği geçti. 9 Kasım 2026'da açıklanan <strong>"Paris Yapay Zeka Emniyeti ve Güvenliği Çağrısı"</strong>, devletler ile öncü yapay zeka laboratuvarlarını ortak bir erken uyarı ve risk yönetimi çerçevesinde buluşturdu.</p>
+
+          <h3>Paris Bildirisi: 6 Ülke ve 10 Teknoloji Devi Aynı Metinde</h3>
+          <p>Kanada Başbakanlığı tarafından duyurulan bildiriye <strong>Bahreyn, Kanada, Finlandiya, Fransa, Norveç ve Hollanda</strong> devlet ve hükümet başkanlarının yanı sıra <strong>Anthropic, Black Forest Labs, Cohere, Domyn, Hugging Face, Microsoft, Mistral AI, OpenAI, Sakana AI ve Synthesia</strong> üst yöneticileri imza attı. Ayrıca LawZero, SaferAI, AI Safety Connect ve Ifri gibi sivil toplum kuruluşları da çerçeveye dahil oldu. Bildiri; olay bildirimi, şeffaflık, erken uyarı sistemleri ve gelişmiş modellerin ortak standartlarla test edilmesini taahhüt altına alıyor.</p>
+
+          <h3>Model Cephesi: Araştırma Hızının İkiye Katlanması ve AlphaGenome 2</h3>
+          <p>Güvenlik bildirilerinin arka planında modellerin kendi araştırmalarını hızlandırma kapasitesi yatıyor. METR tarafından yürütülen değerlendirmelerde yapay zeka araçlarının mühendislik ve araştırma hızını belirgin biçimde katladığı tartışılırken, kurumsal pazarda <strong>Gemini 4 Carbon</strong> ile <strong>Claude Fable 5.2</strong> arasındaki akıl yürütme (reasoning) rekabeti ve Claude'un Google Meet toplantılarına doğrudan entegre olan <em>Claude Meetings</em> hamlesi öne çıktı.</p>
+          <p>Biyoteknoloji tarafında ise <strong>Google DeepMind</strong>, 13 Kasım 2026 gündeminde yer alan <strong>AlphaGenome 2</strong> modelini tanıttı. Model, DNA'daki küçük genetik farklılıkların belirli hücre türleri üzerindeki etkilerini tahmin ederek hastalıkların moleküler nedenlerini çözmeyi hedefliyor.</p>
+        `,
+        sources: [
+          {
+            title: 'Anadolu Ajansı — Bazı ülkeler ve teknoloji şirketleri yapay zeka güvenliğine ilişkin bildiri imzaladı (10 Kasım 2026)',
+            url: 'https://www.aa.com.tr/tr/bilim-teknoloji/bazi-ulkeler-ve-teknoloji-sirketleri-yapay-zeka-guvenligine-iliskin-bildiri-imzaladi/4118115'
+          },
+          {
+            title: 'Webrazzi — Yapay Zeka Gündemi #68: Google DeepMind AlphaGenome 2 (13 Kasım 2026)',
+            url: 'https://webrazzi.com/2026/11/13/yapay-zeka-gundemi-68/'
+          },
+          {
+            title: 'DonanımHaber — AI Günlükleri: Yapay zekâ dünyasında bu hafta (9 Kasım 2026)',
+            url: 'https://www.donanimhaber.com/yapay-zeka-dunyasinda-bu-hafta-9-kasim-2026--212676'
+          },
+          {
+            title: 'DataCamp — Claude Fable 5.2 vs Gemini 4 Carbon (10 Kasım 2026)',
+            url: 'https://www.datacamp.com/tr/blog/claude-fable-5-2-vs-gemini-4-carbon'
+          }
+        ]
+      },
+      {
+        id: 'ankara-kasim-2026-diplomasisi',
+        featured: false,
+        category: 'geopolitics',
+        categoryLabel: 'Küresel Siyaset',
+        countries: ['Türkiye'],
+        date: '13 Kasım 2026',
+        readTime: '5 dk okuma',
+        title: 'Ankara’nın Kasım 2026 Diplomasisi: Türkiye-Katar 12. Stratejik Komitesi, Kıbrıs ve Bölgesel Denge',
+        deck: 'İstanbul’da imzalanan Türkiye-Katar 12. Yüksek Stratejik Komite Ortak Bildirisi’nden Kıbrıs’ta yeni sınır kapıları müzakerelerine ve Orta Doğu geriliminde İncirlik tartışmalarına kadar Ankara’nın yoğun gündemi.',
+        summaryForIg: '🇹🇷 Ankara’nın Kasım 2026 diplomasisi: İstanbul’da Türkiye-Katar 12. Yüksek Stratejik Komite Zirvesi, Kıbrıs’ta BM üçlü görüşmesi ve bölgesel savaş riskine karşı denge politikası.',
+        body: `
+          <p>Kasım 2026'nın ilk iki haftası, Türk dış politikasında hem Körfez eksenli stratejik ortaklıkların hem de Doğu Akdeniz ve Orta Doğu güvenlik dosyalarının eş zamanlı hareketlendiği bir dönem oldu.</p>
+
+          <h3>İstanbul'da Türkiye-Katar 12. Yüksek Stratejik Komite Toplantısı</h3>
+          <p>13 Kasım 2026 tarihinde İstanbul'da düzenlenen <strong>Türkiye Cumhuriyeti ile Katar Devleti Arasında Yüksek Stratejik Komite 12. Toplantısı</strong> sonrasında kapsamlı bir ortak bildiri yayımlandı. Savunma, ticaret, enerji ve bölgesel diplomasi başlıklarında iki ülke arasındaki kurumsal mekanizmanın derinleştirildiği teyit edildi.</p>
+
+          <h3>Kıbrıs'ta Üçlü Görüşme ve Avrupa Komisyonu 2026 Raporu</h3>
+          <p>Dışişleri Bakanlığı Sözcüsü Öncü Keçeli'nin 10 Kasım 2026 tarihli (SC-16) açıklamasında, Kıbrıs Adası'nda liderlerin BM Genel Sekreteri'nin Şahsi Temsilcisi ile gerçekleştirdiği üçlü görüşme ve 1,5 yıldır gündemde olan yeni sınır kapılarının açılmasına dair iş birliği süreci değerlendirildi. Öte yandan 4 Kasım 2026'da yayımlanan Avrupa Komisyonu 2026 Türkiye Raporu ve 14 Kasım 2026'da Ahıska Türklerinin sürgününün 82. yılı dolayısıyla yayımlanan 221 numaralı açıklama, Ankara'nın diplomatik takvimindeki diğer kritik başlıkları oluşturdu.</p>
+
+          <h3>İran Gerilimi ve İncirlik Hassasiyeti</h3>
+          <p>Bölgede ABD-İsrail ile İran arasındaki sıcak çatışma riski Türkiye iç siyasetinde ve güvenlik bürokrasisinde de yakından izleniyor. Nitekim 13 Kasım 2026 tarihli CHP Dış Politika Kurulu değerlendirmesinde de Türkiye'nin İran ile 500 yıllık komşuluk ilişkisine dikkat çekilerek İncirlik Üssü üzerinden komşu ülkelere yönelik hiçbir askeri harekata izin verilmemesi gerektiği vurgulandı.</p>
+        `,
+        sources: [
+          {
+            title: 'T.C. Dışişleri Bakanlığı — Türkiye ile Katar Arasında Yüksek Stratejik Komite 12. Toplantısı Ortak Bildirisi (13 Kasım 2026)',
+            url: 'https://www.mfa.gov.tr/turkiye-cumhuriyeti-ile-katar-devleti-arasinda-yuksek-stratejik-komite-on-ikinci-toplantisi-ortak-bildirisi--13-kasim-2026.tr.mfa'
+          },
+          {
+            title: 'T.C. Dışişleri Bakanlığı — SC-16 Kıbrıs Adası\'nda Üçlü Görüşme Açıklaması (10 Kasım 2026)',
+            url: 'https://www.mfa.gov.tr/sc_-16_-disisleri-bakanligi-sozcusu-oncu-keceli-nin-kibris-adasi-nda-liderlerin-bm-genel-sekreteri-nin-sahsi-temsilcisi-yle-uclu-gorusmesi-hk-sc.tr.mfa'
+          },
+          {
+            title: 'T.C. Dışişleri Bakanlığı — Güncel Açıklamalar (Kasım 2026)',
+            url: 'https://www.mfa.gov.tr/aciklamalar-genel.tr.mfa'
+          },
+          {
+            title: 'CHP Dış Politika Kurulu — 13 Kasım 2026 Tarihli Güncel Değerlendirmeler',
+            url: 'https://chp.org.tr/haberler/chp-dis-politika-kurulunun-13-kasim-2026-tarihli-guncel-degerlendirmeleri'
+          }
+        ]
+      },
+      {
+        id: 'sogd-turk-kervanlarindan-kutup-ipek-yoluna',
+        featured: false,
+        category: 'history',
+        categoryLabel: 'Tarih Köşesi',
+        countries: ['Çin', 'Rusya', 'ABD'],
+        date: '14 Kasım 2026',
+        readTime: '7 dk okuma',
+        title: 'Soğd-Türk Kervanlarından "Kutup İpek Yolu"na: Ticaret Koridorları İmparatorlukları Nasıl Kurup Yıkar?',
+        deck: '4. yüzyıldan 8. yüzyıla kadar Avrasya ticaretini domine eden karma Soğd-Türk kervan ağlarından, bugünün çip ambargolarına ve eriyen buzullarla açılan Arktik ticaret rotalarına uzanan tarihsel süreklilik.',
+        summaryForIg: '🏛️ Tarih Köşesi: 4.-8. yüzyılda Büyük İpek Yolu’nu yöneten Soğd-Türk kervan kültüründen bugünkü "Teknoloji İnkârı" ve Arktik İpek Yolu savaşına: Haritalar değişir, koridor savaşı değişmez.',
+        body: `
+          <p>Bugün ABD ile Çin arasında yaşanan yarı iletken (çip) kısıtlamalarını veya Rusya-Çin hattındaki yeni enerji boru hatlarını yalnızca 21. yüzyıla ait krizler sanmak büyük bir yanılgıdır. Tarih boyunca imparatorlukların yükseliş ve çöküşünü belirleyen ana yasa değişmemiştir: <strong>Ticaret ve bilgi koridorunu kim kontrol ederse, küresel standardı o koyar.</strong></p>
+
+          <h3>Büyük İpek Yolu'nun Gerçek Motoru: Soğd-Türk Sentezi</h3>
+          <p>Büyük İpek Yolu; batıda Bizans İmparatorluğu, Nil-Ceyhun hattında Sasani İmparatorluğu'ndan İlhanlılar'a, doğuda ise Üç Krallık döneminden Yuan Hanedanı'na kadar devasa bir coğrafyayı birbirine bağladı. Ancak 4. yüzyıldan 8. yüzyıla kadar bu hattın asıl organizatörleri yalnızca yerleşik imparatorluklar değildi. Dilbilimci ve tarihçi A. V. Dybo'nun da vurguladığı üzere, İpek Yolu'nun arkasındaki temel itici güç, Orta Asya'nın ana kervan tüccarları olan <strong>Soğdlar ile Türk boylarının oluşturduğu karma Soğd-Türk kültürüydü.</strong></p>
+          <p>Bu ağ sadece ipek ve baharat taşımadı; diplomatik istihbaratı, metalürji tekniklerini ve inanç sistemlerini (Nasturilik, Maniheizm, Budizm ve ardından İslam) Orta Asya'dan Çin'in içlerine kadar taşıyarak Kuzey Çin'de göçebe kökenli askeri devletlerin doğuşunu tetikledi.</p>
+
+          <h3>2026'ya Projeksiyon: "Teknoloji İnkârı" ve Kutup İpek Yolu</h3>
+          <p>Soğuk Savaş sonrası "tarihin sonu" tezleri çökerken, <em>American Affairs</em> analizlerinde dikkat çekilen <strong>"Soğuk Savaş tarzı teknoloji inkârı" (technology denial)</strong> stratejisi yeniden sahneye döndü. Geçmişte kervan geçiş noktalarını ve İskenderiye-Guangzhou deniz hattını kontrol etme mücadelesi neyse, bugün gelişmiş yapay zeka çiplerini ve eriyen Arktik buzullarıyla açılan <strong>"Kutup İpek Yolu" (Polar Silk Road)</strong> deniz rotalarını kontrol etme mücadelesi tam olarak aynı jeopolitik reflekstir.</p>
+        `,
+        sources: [
+          {
+            title: 'Wikipedia — Silk Road: Sogdian–Türkic tribes (4th–8th centuries)',
+            url: 'https://en.wikipedia.org/wiki/Silk_Road'
+          },
+          {
+            title: 'American Affairs Journal — The New Silk Road and the Return of Geopolitics',
+            url: 'https://americanaffairsjournal.org/2019/02/the-new-silk-road-and-the-return-of-geopolitics/'
+          },
+          {
+            title: 'Vision of Humanity — The New Cold War: Emergence of Global Competitors',
+            url: 'https://www.visionofhumanity.org/the-new-cold-war-emergence-of-global-competitors/'
+          }
+        ]
+      }
+    ];
+
+    // UYGULAMA DURUMU (STATE)
+    let state = {
+      currentBrandKey: 'meridyen',
+      customBrandName: '',
+      activeCategory: 'all',
+      activeCountry: 'all',
+      searchQuery: '',
+      onlySaved: false,
+      savedIds: [],
+      darkMode: true,
+      activeModalArticleId: null
+    };
+
+    // LOCALSTORAGE YÜKLEME
+    function loadSavedState() {
+      try {
+        const raw = localStorage.getItem('meridyen_saved_articles');
+        if (raw) {
+          state.savedIds = JSON.parse(raw);
+        }
+        const savedRepo = localStorage.getItem('meridyen_gh_repo');
+        if (savedRepo) { const rEl = document.getElementById('ghRepoInput'); if (rEl) rEl.value = savedRepo; }
+        const savedToken = localStorage.getItem('meridyen_gh_pat');
+        if (savedToken) { const tEl = document.getElementById('ghTokenInput'); if (tEl) tEl.value = savedToken; }
+      } catch (e) {
+        state.savedIds = [];
+      }
+    }
+
+    function saveSavedState() {
+      try {
+        localStorage.setItem('meridyen_saved_articles', JSON.stringify(state.savedIds));
+      } catch (e) {
+        // ignore sandbox storage restriction
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotice');
+      toast.textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2600);
+    }
+
+    function copyTextToClipboard(text, successMsg) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(successMsg);
+        }).catch(() => {
+          fallbackCopy(text, successMsg);
+        });
+      } else {
+        fallbackCopy(text, successMsg);
+      }
+    }
+
+    function fallbackCopy(text, successMsg) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast(successMsg);
+      } catch (e) {
+        showToast('Kopyalandı');
+      }
+      document.body.removeChild(ta);
+    }
+
+    // SHA-1 HESAPLAMA (NETLIFY FILE DIGEST API İÇİN)
+    async function computeSha1Hex(str) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+      const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function utf8ToBase64(str) {
+      const bytes = new TextEncoder().encode(str);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    }
+
+    // GITHUB REST API DEPLOY İŞLEVİ (SIFIR KREDİ • SINIRSIZ)
+    async function deployToNetlifyViaApi() {
+      const repoInput = (document.getElementById('ghRepoInput')?.value || '').trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '').replace(/\/$/, '');
+      const tokenInput = (document.getElementById('ghTokenInput')?.value || '').trim();
+      const statusBox = document.getElementById('apiDeployStatusBox');
+      const deployBtn = document.getElementById('executeApiDeployBtn');
+
+      if (!statusBox) return;
+      statusBox.classList.remove('hidden');
+
+      if (!repoInput.includes('/') || !tokenInput) {
+        statusBox.textContent = '⚠️ Lütfen "kullaniciadi/repo-adi" ve GitHub Personal Access Token girin.';
+        statusBox.className = 'p-3 rounded-lg bg-amber-500/10 border border-amber-500/40 font-code text-xs text-amber-300';
+        return;
+      }
+
+      try {
+        localStorage.setItem('meridyen_gh_repo', repoInput);
+        localStorage.setItem('meridyen_gh_pat', tokenInput);
+      } catch (e) {
+        // ignore
+      }
+
+      if (deployBtn) deployBtn.disabled = true;
+      statusBox.className = 'p-3 rounded-lg bg-slate-900 border border-slate-700 font-code text-xs text-cyan-300';
+      statusBox.textContent = `⏳ 1/2: ${repoInput} reposu kontrol ediliyor...`;
+
+      try {
+        const apiUrl = `https://api.github.com/repos/${repoInput}/contents/index.html`;
+        let existingSha = null;
+
+        const checkRes = await fetch(apiUrl, {
+          headers: {
+            'Authorization': `Bearer ${tokenInput}`,
+            'Accept': 'application/vnd.github+json'
+          }
+        });
+
+        if (checkRes.ok) {
+          const checkData = await checkRes.json();
+          existingSha = checkData.sha;
+        } else if (checkRes.status !== 404) {
+          throw new Error(`Repo okunamadı (HTTP ${checkRes.status}). Repo adı ve token yetkisini kontrol edin.`);
+        }
+
+        statusBox.textContent = '⏳ 2/2: Ziyaretçi sürümü hazırlanıp GitHub reposuna yazılıyor...';
+        const cloneDoc = document.documentElement.cloneNode(true);
+        ['#adminStudioBar', '#openInfraModalBtn', '#studioIgPreviewCard', '#studioApiBridgeCard', '#infraModal', '#toggleStudioFooterBtn'].forEach(sel => {
+          const el = cloneDoc.querySelector(sel);
+          if (el) el.remove();
+        });
+
+        const htmlContent = '<!DOCTYPE html>\n' + cloneDoc.outerHTML;
+        const payload = {
+          message: `Blog güncellemesi (${new Date().toLocaleDateString('tr-TR')})`,
+          content: utf8ToBase64(htmlContent)
+        };
+        if (existingSha) payload.sha = existingSha;
+
+        const putRes = await fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${tokenInput}`,
+            'Accept': 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!putRes.ok) {
+          const errData = await putRes.json().catch(() => ({}));
+          throw new Error(errData.message || `Yükleme hatası (HTTP ${putRes.status}).`);
+        }
+
+        const [owner, repo] = repoInput.split('/');
+        const ghPagesUrl = repo.toLowerCase() === `${owner.toLowerCase()}.github.io`
+          ? `https://${owner}.github.io/`
+          : `https://${owner}.github.io/${repo}/`;
+
+        statusBox.className = 'p-3 rounded-lg bg-emerald-500/15 border border-emerald-500/40 font-code text-xs text-emerald-300';
+        statusBox.innerHTML = `✅ GitHub'a gönderildi! Eğer Cloudflare Pages bağlıysa 10 sn içinde güncellenir. GitHub Pages linkin: <a href="${ghPagesUrl}" target="_blank" rel="noopener noreferrer" class="underline font-bold">${ghPagesUrl}</a>`;
+        showToast('GitHub reposu başarıyla güncellendi!');
+      } catch (err) {
+        statusBox.className = 'p-3 rounded-lg bg-rose-500/15 border border-rose-500/40 font-code text-xs text-rose-300';
+        statusBox.textContent = `❌ Hata: ${err.message}`;
+      } finally {
+        if (deployBtn) deployBtn.disabled = false;
+      }
+    }
+
+    function setElText(id, val) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    }
+
+    function onEl(id, evt, handler) {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener(evt, handler);
+    }
+
+    // MARKA GÜNCELLEME
+    function renderBrand() {
+      const preset = BRAND_PRESETS[state.currentBrandKey] || BRAND_PRESETS.meridyen;
+      const displayName = state.customBrandName ? state.customBrandName.toUpperCase() : preset.name;
+      const domain = 'dapperpasha.github.io/kisiseldeneyim.github.io';
+
+      setElText('brandTitleDisplay', displayName);
+      setElText('brandDomainDisplay', domain);
+      setElText('brandTaglineDisplay', preset.tagline);
+      setElText('footerBrandName', displayName);
+      setElText('igAvatarLetter', displayName.charAt(0) || 'M');
+      setElText('igHandlePreview', `bedeysin • ${displayName}`);
+      setElText('igBioTextPreview', preset.bio);
+      setElText('igBioLinkPreview', `🔗 ${domain}`);
+
+      document.querySelectorAll('.brand-btn').forEach(btn => {
+        const key = btn.getAttribute('data-brand');
+        if (!state.customBrandName && key === state.currentBrandKey) {
+          btn.className = 'brand-btn px-2.5 py-1 rounded font-code transition border border-amber-500/50 bg-amber-500/20 text-amber-300';
+        } else {
+          btn.className = 'brand-btn px-2.5 py-1 rounded font-code transition border border-slate-800 bg-slate-900/80 text-slate-400 hover:text-slate-200';
+        }
+      });
+    }
+
+    // KATEGORİ RENK YARDIMCISI
+    function getCategoryStyle(cat) {
+      if (cat === 'ai') {
+        return {
+          badge: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
+          dot: 'bg-cyan-400'
+        };
+      }
+      if (cat === 'geopolitics') {
+        return {
+          badge: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+          dot: 'bg-amber-400'
+        };
+      }
+      return {
+        badge: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+        dot: 'bg-emerald-400'
+      };
+    }
+
+    // FİLTRELENMİŞ MAKALELER
+    function getFilteredArticles() {
+      return ARTICLES.filter(art => {
+        if (state.onlySaved && !state.savedIds.includes(art.id)) return false;
+        if (state.activeCategory !== 'all' && art.category !== state.activeCategory) return false;
+        if (state.activeCountry !== 'all' && !art.countries.includes(state.activeCountry)) return false;
+        if (state.searchQuery.trim() !== '') {
+          const q = state.searchQuery.toLowerCase();
+          const inTitle = art.title.toLowerCase().includes(q);
+          const inDeck = art.deck.toLowerCase().includes(q);
+          const inCountries = art.countries.some(c => c.toLowerCase().includes(q));
+          return inTitle || inDeck || inCountries;
+        }
+        return true;
+      });
+    }
+
+    // HERO RENDER
+    function renderHero() {
+      const heroEl = document.getElementById('heroSection');
+      const featured = ARTICLES[0];
+      const isSaved = state.savedIds.includes(featured.id);
+
+      heroEl.innerHTML = `
+        <div class="relative rounded-2xl border border-slate-800 bg-gradient-to-br from-[#141A26] via-[#10141D] to-[#0B0D11] p-6 sm:p-8 shadow-xl overflow-hidden">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-code font-medium border bg-amber-500/15 text-amber-300 border-amber-500/30">
+                HAFTANIN MANŞET DOSYASI • ${featured.categoryLabel.toUpperCase()}
+              </span>
+              <span class="text-xs font-code text-slate-400">${featured.date} • ${featured.readTime}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              ${featured.countries.map(c => `<span class="px-2 py-0.5 rounded bg-slate-800/90 border border-slate-700 text-[11px] font-code text-slate-300">${c}</span>`).join('')}
+            </div>
+          </div>
+
+          <h1 class="text-2xl sm:text-4xl font-editorial font-bold text-white leading-tight mb-3 cursor-pointer hover:text-amber-300 transition" data-open-article="${featured.id}">
+            ${featured.title}
+          </h1>
+
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed max-w-4xl mb-6">
+            ${featured.deck}
+          </p>
+
+          <div class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-800/80">
+            <div class="flex items-center gap-3">
+              <button
+                type="button"
+                data-open-article="${featured.id}"
+                class="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs transition flex items-center gap-1.5"
+              >
+                <span>Dosyayı Oku &amp; Kaynakları İncele</span>
+                <span>→</span>
+              </button>
+              <button
+                type="button"
+                data-toggle-save="${featured.id}"
+                class="px-3 py-2 rounded-lg border border-slate-700 bg-slate-900/70 hover:border-amber-500/50 text-xs text-slate-200 transition"
+              >
+                ${isSaved ? '★ Arşivde Kayıtlı' : '☆ Arşive Kaydet'}
+              </button>
+            </div>
+            <div class="text-xs text-slate-400 font-code">
+              Doğrulanmış Kaynaklar: Ekonomim, Milliyet, AA
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // MAKALELER RENDER
+    function renderArticles() {
+      const list = getFilteredArticles();
+      const grid = document.getElementById('articlesGrid');
+      const countLabel = document.getElementById('articleCountLabel');
+      const savedBadge = document.getElementById('savedCountBadge');
+
+      savedBadge.textContent = String(state.savedIds.length);
+      countLabel.textContent = `${list.length} yazı listeleniyor`;
+
+      if (list.length === 0) {
+        grid.innerHTML = `
+          <div class="rounded-xl border border-slate-800 bg-slateCard/60 p-8 text-center">
+            <p class="text-slate-300 font-medium text-sm mb-2">Seçilen filtreye uygun analiz bulunamadı.</p>
+            <button type="button" id="resetFiltersBtn" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-semibold text-xs">
+              Tüm Filtreleri Sıfırla
+            </button>
+          </div>
+        `;
+        const resetBtn = document.getElementById('resetFiltersBtn');
+        if (resetBtn) {
+          resetBtn.addEventListener('click', () => {
+            state.activeCategory = 'all';
+            state.activeCountry = 'all';
+            state.searchQuery = '';
+            state.onlySaved = false;
+            document.getElementById('searchInput').value = '';
+            updateFilterButtonsUI();
+            renderArticles();
+          });
+        }
+        return;
+      }
+
+      grid.innerHTML = list.map(art => {
+        const st = getCategoryStyle(art.category);
+        const isSaved = state.savedIds.includes(art.id);
+        return `
+          <article class="rounded-xl border border-slate-800/90 bg-slateCard/90 hover:border-slate-700 p-5 transition shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-md text-[11px] font-code border ${st.badge}">
+                  ${art.categoryLabel}
+                </span>
+                <span class="text-xs font-code text-slate-400">${art.date}</span>
+                <span class="text-slate-600">•</span>
+                <span class="text-xs font-code text-slate-400">${art.readTime}</span>
+              </div>
+              <div class="flex items-center gap-1">
+                ${art.countries.map(c => `<span class="px-2 py-0.5 rounded bg-obsidian border border-slate-800 text-[10px] font-code text-slate-300">${c}</span>`).join('')}
+              </div>
+            </div>
+
+            <h3 class="text-lg sm:text-xl font-editorial font-bold text-white hover:text-amber-300 cursor-pointer transition mb-2" data-open-article="${art.id}">
+              ${art.title}
+            </h3>
+
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
+              ${art.deck}
+            </p>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/70 text-xs">
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  data-open-article="${art.id}"
+                  class="text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1"
+                >
+                  <span>Tam Metni Oku</span>
+                  <span>→</span>
+                </button>
+                <span class="text-slate-700">|</span>
+                <button
+                  type="button"
+                  data-copy-summary="${art.id}"
+                  class="text-slate-400 hover:text-slate-200 font-code text-[11px]"
+                >
+                  IG Özeti Kopyala
+                </button>
+              </div>
+
+              <button
+                type="button"
+                data-toggle-save="${art.id}"
+                class="font-code text-[11px] ${isSaved ? 'text-amber-400' : 'text-slate-400 hover:text-slate-200'}"
+              >
+                ${isSaved ? '★ Kaydedildi' : '☆ Kaydet'}
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function updateFilterButtonsUI() {
+      document.querySelectorAll('.cat-tab').forEach(btn => {
+        const cat = btn.getAttribute('data-category');
+        if (cat === state.activeCategory && !state.onlySaved) {
+          btn.className = 'cat-tab px-3 py-1.5 rounded-md text-xs font-medium transition bg-amber-500 text-slate-950 font-semibold';
+        } else {
+          btn.className = 'cat-tab px-3 py-1.5 rounded-md text-xs font-medium transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 flex items-center gap-1.5';
+        }
+      });
+
+      document.querySelectorAll('.country-pill').forEach(btn => {
+        const c = btn.getAttribute('data-country');
+        if (c === state.activeCountry) {
+          btn.className = 'country-pill px-2 py-0.5 rounded text-[11px] font-code border border-amber-500/40 bg-amber-500/15 text-amber-300';
+        } else {
+          btn.className = 'country-pill px-2 py-0.5 rounded text-[11px] font-code border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-slate-200';
+        }
+      });
+
+      const savedBtn = document.getElementById('savedFilterBtn');
+      if (state.onlySaved) {
+        savedBtn.className = 'px-3 py-1.5 rounded-lg border border-amber-500 bg-amber-500/20 text-xs font-medium text-amber-300 flex items-center gap-1.5 transition';
+      } else {
+        savedBtn.className = 'px-3 py-1.5 rounded-lg border border-slate-700/80 bg-slate-900/80 hover:border-amber-500/50 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition';
+      }
+    }
+
+    // MAKALE MODALINI AÇ
+    function openArticleModal(articleId) {
+      const art = ARTICLES.find(a => a.id === articleId);
+      if (!art) return;
+      state.activeModalArticleId = art.id;
+      const st = getCategoryStyle(art.category);
+
+      document.getElementById('modalCategoryBadge').innerHTML = `
+        <span class="px-2.5 py-0.5 rounded text-xs font-code border ${st.badge}">${art.categoryLabel}</span>
+        ${art.countries.map(c => `<span class="px-2 py-0.5 rounded bg-slate-800 text-[11px] font-code text-slate-300">${c}</span>`).join('')}
+      `;
+      document.getElementById('modalMetaInfo').textContent = `${art.date} • ${art.readTime} • Yayına Hazır Dosya`;
+      document.getElementById('modalArticleTitle').textContent = art.title;
+      document.getElementById('modalArticleDeck').textContent = art.deck;
+      document.getElementById('modalArticleBody').innerHTML = art.body;
+
+      document.getElementById('modalSourcesList').innerHTML = art.sources.map(s => `
+        <li>
+          <a href="${s.url}" target="_blank" rel="noopener noreferrer" class="text-amber-400 hover:underline flex items-center gap-1.5">
+            <span>🔗 ${s.title}</span>
+          </a>
+        </li>
+      `).join('');
+
+      document.getElementById('articleModal').classList.remove('hidden');
+    }
+
+    // EVENT LISTENERS
+    document.addEventListener('DOMContentLoaded', () => {
+      // Canlı Netlify domaininde ziyaretçilere üst yönetim çubuğunu varsayılan olarak gizle
+      if (window.location.hostname.includes('netlify.app')) {
+        const bar = document.getElementById('adminStudioBar');
+        if (bar) bar.classList.add('hidden');
+      }
+
+      loadSavedState();
+      renderBrand();
+      renderHero();
+      renderArticles();
+
+      // Marka Seçimi
+      onEl('brandPresetContainer', 'click', (e) => {
+        const btn = e.target.closest('.brand-btn');
+        if (!btn) return;
+        state.currentBrandKey = btn.getAttribute('data-brand');
+        state.customBrandName = '';
+        const inp = document.getElementById('customBrandInput');
+        if (inp) inp.value = '';
+        renderBrand();
+      });
+
+      // Özel İsim Uygulama
+      onEl('applyCustomBrandBtn', 'click', () => {
+        const inp = document.getElementById('customBrandInput');
+        const val = inp ? inp.value.trim() : '';
+        if (val) {
+          state.customBrandName = val;
+          renderBrand();
+          showToast(`Site adı "${val.toUpperCase()}" olarak güncellendi!`);
+        }
+      });
+
+      onEl('customBrandInput', 'keydown', (e) => {
+        if (e.key === 'Enter') {
+          const btn = document.getElementById('applyCustomBrandBtn');
+          if (btn) btn.click();
+        }
+      });
+
+      // Kategori Sekmeleri
+      onEl('categoryTabs', 'click', (e) => {
+        const btn = e.target.closest('.cat-tab');
+        if (!btn) return;
+        state.activeCategory = btn.getAttribute('data-category');
+        state.onlySaved = false;
+        updateFilterButtonsUI();
+        renderArticles();
+      });
+
+      // Ülke Filtreleri
+      onEl('countryFilterBar', 'click', (e) => {
+        const btn = e.target.closest('.country-pill');
+        if (!btn) return;
+        state.activeCountry = btn.getAttribute('data-country');
+        updateFilterButtonsUI();
+        renderArticles();
+      });
+
+      // Arama
+      onEl('searchInput', 'input', (e) => {
+        state.searchQuery = e.target.value;
+        renderArticles();
+      });
+
+      // Kaydedilenler Filtresi
+      onEl('savedFilterBtn', 'click', () => {
+        state.onlySaved = !state.onlySaved;
+        updateFilterButtonsUI();
+        renderArticles();
+      });
+
+      // Makale Tıklamaları (Delegation)
+      document.body.addEventListener('click', (e) => {
+        const openBtn = e.target.closest('[data-open-article]');
+        if (openBtn) {
+          openArticleModal(openBtn.getAttribute('data-open-article'));
+          return;
+        }
+
+        const saveBtn = e.target.closest('[data-toggle-save]');
+        if (saveBtn) {
+          const id = saveBtn.getAttribute('data-toggle-save');
+          if (state.savedIds.includes(id)) {
+            state.savedIds = state.savedIds.filter(item => item !== id);
+            showToast('Arşivden çıkarıldı');
+          } else {
+            state.savedIds.push(id);
+            showToast('Okuma arşivine kaydedildi');
+          }
+          saveSavedState();
+          renderHero();
+          renderArticles();
+          return;
+        }
+
+        const copySumBtn = e.target.closest('[data-copy-summary]');
+        if (copySumBtn) {
+          const id = copySumBtn.getAttribute('data-copy-summary');
+          const art = ARTICLES.find(a => a.id === id);
+          if (art) {
+            copyTextToClipboard(art.summaryForIg, 'Instagram Story özeti kopyalandı!');
+          }
+        }
+      });
+
+      // Modal Kapatma (ve arka plan tıklaması ile kapatma)
+      onEl('closeArticleModalBtn', 'click', () => {
+        const modal = document.getElementById('articleModal');
+        if (modal) modal.classList.add('hidden');
+      });
+
+      onEl('articleModal', 'click', (e) => {
+        if (e.target.id === 'articleModal') {
+          e.target.classList.add('hidden');
+        }
+      });
+
+      onEl('modalCopySummaryBtn', 'click', () => {
+        const art = ARTICLES.find(a => a.id === state.activeModalArticleId);
+        if (art) {
+          copyTextToClipboard(art.summaryForIg, 'Instagram Story özeti kopyalandı!');
+        }
+      });
+
+      // Altyapı & API Modalı Açma Butonları
+      onEl('openInfraModalBtn', 'click', () => {
+        const modal = document.getElementById('infraModal');
+        if (modal) modal.classList.remove('hidden');
+      });
+
+      onEl('quickApiDeployBtn', 'click', () => {
+        const modal = document.getElementById('infraModal');
+        if (modal) modal.classList.remove('hidden');
+      });
+
+      onEl('openApiPanelFromSidebarBtn', 'click', () => {
+        const modal = document.getElementById('infraModal');
+        if (modal) modal.classList.remove('hidden');
+      });
+
+      onEl('closeInfraModalBtn', 'click', () => {
+        const modal = document.getElementById('infraModal');
+        if (modal) modal.classList.add('hidden');
+      });
+
+      // Netlify API Deploy Başlatma
+      onEl('executeApiDeployBtn', 'click', () => {
+        deployToNetlifyViaApi();
+      });
+
+      // Stüdyo çubuğu göster/gizle
+      onEl('toggleStudioFooterBtn', 'click', () => {
+        const bar = document.getElementById('adminStudioBar');
+        if (bar) bar.classList.toggle('hidden');
+      });
+
+      // Bio Kopyalama
+      onEl('copyBioDirectBtn', 'click', () => {
+        const bioEl = document.getElementById('igBioTextPreview');
+        const linkEl = document.getElementById('igBioLinkPreview');
+        const bioText = bioEl ? bioEl.textContent : '';
+        const linkText = linkEl ? linkEl.textContent.replace('🔗 ', '') : 'dapperpasha.github.io/kisiseldeneyim.github.io';
+        copyTextToClipboard(`${bioText}\nhttps://${linkText}`, 'Instagram Bio metni kopyalandı!');
+      });
+
+      // Logo Reset
+      onEl('logoResetLink', 'click', (e) => {
+        e.preventDefault();
+        state.activeCategory = 'all';
+        state.activeCountry = 'all';
+        state.searchQuery = '';
+        state.onlySaved = false;
+        const inp = document.getElementById('searchInput');
+        if (inp) inp.value = '';
+        updateFilterButtonsUI();
+        renderArticles();
+      });
+
+      // Tema Değiştirici
+      onEl('themeToggleBtn', 'click', () => {
+        state.darkMode = !state.darkMode;
+        const body = document.body;
+        const header = document.getElementById('mainHeader');
+        const sun = document.getElementById('themeIconSun');
+        const moon = document.getElementById('themeIconMoon');
+
+        if (state.darkMode) {
+          body.classList.remove('bg-[#161B26]');
+          body.classList.add('bg-obsidian', 'text-slate-100');
+          header.classList.add('bg-obsidian/90');
+          sun.classList.add('hidden');
+          moon.classList.remove('hidden');
+          showToast('Gece / Terminal Modu Aktif');
+        } else {
+          body.classList.remove('bg-obsidian');
+          body.classList.add('bg-[#161B26]', 'text-slate-100');
+          sun.classList.remove('hidden');
+          moon.classList.add('hidden');
+          showToast('Yüksek Kontrast Editoryal Mod Aktif');
+        }
+      });
+    });
+  </script>
+
+</body></html>
